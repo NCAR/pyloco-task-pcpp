@@ -14,14 +14,14 @@ class PcppTask(pyloco.Task):
 Example
 -------
 
-::
+An example Fortran souce file of 'my.f90'. ::
 
        program test
           integer, parameter :: x = XVAL, y = YVAL
           print *, x, "+", y, "=", x+y
        end program
 
-::
+An example pyloco command to preprocess 'my.f90' to 'pcpp_my.f90'. ::
 
        >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=1 -o pcpp_my.f90
 """
