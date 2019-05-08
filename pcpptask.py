@@ -15,12 +15,14 @@ Example
 -------
 
 ::
+
        program test
           integer, parameter :: x = XVAL, y = YVAL
           print *, x, "+", y, "=", x+y
        end program
 
 ::
+
        >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=1 -o pcpp_my.f90
 """
     _name_ = "pcpp"
