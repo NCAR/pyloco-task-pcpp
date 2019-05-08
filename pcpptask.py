@@ -21,9 +21,6 @@ Example
        end program
 
 ::
-       :linenos:
-       :caption: example command
-
        >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=1 -o pcpp_my.f90
 """
     _name_ = "pcpp"
