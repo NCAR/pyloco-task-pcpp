@@ -45,16 +45,15 @@ optional arguments:
 Example
 -------
 
-.. code-block:: fortran
-       :linenos:
-       :caption: my.f90
 
+::
        program test
           integer, parameter :: x = XVAL, y = YVAL
           print *, x, "+", y, "=", x+y
        end program
 
-.. code-block:: bash
+
+::
        :linenos:
        :caption: example command
 
