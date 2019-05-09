@@ -48,14 +48,17 @@ forward output variables:
 Example
 -------
 
-An example Fortran souce file of 'my.f90'. ::
+Following example reads 'my.f90' Fortran source file and displays preprocessed output
+on screen using XVAL=1 and YVAL=2 macro definitions.
+
+An example Fortran source file of 'my.f90'. ::
 
         program test
             integer, parameter :: x = XVAL, y = YVAL
             print *, x, "+", y, "=", x+y
         end program
 
-An example pyloco command to preprocess 'my.f90' to 'pcpp_my.f90'. ::
+An example pyloco command to preprocess 'my.f90'. ::
 
         >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=2
         #line 1 "my.f90"
