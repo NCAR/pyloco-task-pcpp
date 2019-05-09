@@ -1,6 +1,6 @@
-===========
-'pcpp' task
-===========
+=========================
+'pcpp' task version 0.1.2
+=========================
 
 'pcpp' task wraps pcpp Python C99 preprocessing package to work with other Pyloco tasks.
 
@@ -8,29 +8,29 @@ Installation
 ------------
 
 Before installing 'pcpp' task, please make sure that 'pyloco' is installed.
-Run the following command if you need to install 'pyloco'.
+Run the following command if you need to install 'pyloco'. ::
 
->>> pip install pyloco
+    >>> pip install pyloco
 
-Or, if 'pyloco' is already installed, upgrade 'pyloco' with the following command
+Or, if 'pyloco' is already installed, upgrade 'pyloco' with the following command ::
 
->>> pip install -U pyloco
+    >>> pip install -U pyloco
 
-To install 'pcpp' task, run the following 'pyloco' command.
+To install 'pcpp' task, run the following 'pyloco' command.  ::
 
->>> pyloco install pcpp
+    >>> pyloco install pcpp
 
 Command-line syntax
 -------------------
 
 usage: pyloco pcpp [-h] [-o OUTPUT] [-D DEFINES] [-I INCLUDES]
                    [--general-arguments]
-                   [data [data ...]]
+                   data 
 
 a wrapper task for pcpp Python C99 preprocessing package
 
 positional arguments:
-  data                  Files to preprocess (use '-' for stdin)
+  data                  File to preprocess (use '-' for stdin)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -41,17 +41,25 @@ optional arguments:
   --general-arguments   Task-common arguments. Use --verbose to see a list of
                         general arguments
 
+forward output variables:
+   data                 preprocessed source code
+
 
 Example
 -------
 
 An example Fortran souce file of 'my.f90'. ::
 
-       program test
-          integer, parameter :: x = XVAL, y = YVAL
-          print *, x, "+", y, "=", x+y
-       end program
+        program test
+            integer, parameter :: x = XVAL, y = YVAL
+            print *, x, "+", y, "=", x+y
+        end program
 
 An example pyloco command to preprocess 'my.f90' to 'pcpp_my.f90'. ::
 
-       >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=1 -o pcpp_my.f90
+        >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=2
+        #line 1 "my.f90"
+               program test
+                  integer, parameter :: x = 1, y = 2
+                  print *, x, "+", y, "=", x+y
+               end program
