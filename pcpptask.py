@@ -2,8 +2,21 @@
 
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+import sys
+import os
 import pcpp
 import pyloco
+import tempfile
+import shutil
+
+class TaskCmdPreprocessor(pcpp.cmd.CmdPreprocessor):
+
+    def write(self, oh):
+        """work-around for flushing after write"""
+
+        super(TaskCmdPreprocessor, self).write(oh)
+        oh.flush()
+
 
 class PcppTask(pyloco.Task):
     """a wrapper task for pcpp Python C99 preprocessing package
@@ -16,22 +29,27 @@ Example
 
 An example Fortran souce file of 'my.f90'. ::
 
-       program test
-          integer, parameter :: x = XVAL, y = YVAL
-          print *, x, "+", y, "=", x+y
-       end program
+        program test
+            integer, parameter :: x = XVAL, y = YVAL
+            print *, x, "+", y, "=", x+y
+        end program
 
 An example pyloco command to preprocess 'my.f90' to 'pcpp_my.f90'. ::
 
-       >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=1 -o pcpp_my.f90
+        >>> pyloco pcpp my.f90 -D XVAL=1 -D YVAL=2
+        #line 1 "my.f90"
+               program test
+                  integer, parameter :: x = 1, y = 2
+                  print *, x, "+", y, "=", x+y
+               end program
 """
     _name_ = "pcpp"
-    _version_ = "0.1.0"
+    _version_ = "0.1.2"
 
     def __init__(self, parent):
 
-        self.add_data_argument("data", nargs="*",
-                               help="Files to preprocess (use \'-\' for stdin)")
+        self.add_data_argument("data",
+                               help="File to preprocess (use \'-\' for stdin)")
 
         self.add_option_argument("-o", "--output",
                                  help="Output to a file instead of stdout")
@@ -40,14 +58,15 @@ An example pyloco command to preprocess 'my.f90' to 'pcpp_my.f90'. ::
         self.add_option_argument("-I", dest="includes", nargs=1, action="append",
                                  help="Path to search for unfound #include's")
 
+        self.register_forward("data", help="preprocessed source code")
+
     def perform(self, targs):
 
         valid_opts = {"output": ("-o", None, False),
                       "defines": ("-D", 1, True), "includes": ("-I", 1, True)}
         argv = ["pcpp"]
 
-        for d in targs.data:
-            argv.append(d)
+        argv.append(targs.data)
 
         for opt, (flag, nargs, append) in valid_opts.items():
             val = getattr(targs, opt, None)
@@ -67,7 +86,30 @@ An example pyloco command to preprocess 'my.f90' to 'pcpp_my.f90'. ::
                     else:
                         argv.extend([flag, *val])     
 
-        p = pcpp.cmd.CmdPreprocessor(argv)
+        dout = tempfile.mkdtemp()
+        tout = os.path.join(dout, "prep")
+
+        if "-o" in argv:
+            argv[argv.index("-o") + 1] = tout
+
+        else:
+            argv.extend(["-o", tout])
+
+        p = TaskCmdPreprocessor(argv)
+
+        with open(tout) as f:
+            output = f.read()
+
+        if targs.output:
+            shutil.move(tout, targs.output)
+
+        else:
+            print(output)
+
+        self.add_forward(data=output)
+
+        shutil.rmtree(dout)
+
         return p.return_code
 
 #argp.add_argument('inputs', metavar = 'input', default = [sys.stdin], nargs = '*', action = FileAction, help = 'Files to preprocess (use \'-\' for stdin)')
